@@ -83,66 +83,72 @@ export default async function handler(
     const { food } = req.body;
     const { hero, villain } = getUniqueFoodPair(food);
 
-    const prompt = `Create viral "food battle" content for a short video (12-16 seconds) featuring ${hero} (hero) vs ${villain} (villain).
+    const prompt = `Create a viral food battle short.
 
-Generate the following in JSON format:
+Hero: ${hero}
+Villain: ${villain}
+
+Make it dramatic, aggressive, and entertaining.
+
+Return EXACTLY in this JSON format:
+
 {
-  "script": {
-    "dialogue": [
-      {"speaker": "${hero}", "line": "..."},
-      {"speaker": "${villain}", "line": "..."}
-    ],
-    "duration": "..."
-  },
-  "imagePrompts": [
-    "Cinematic shot of ${hero} with warm golden lighting, detailed textures, macro photography style...",
-    "Dramatic shot of ${villain} with moody lighting, showing processed texture...",
-    "Epic battle scene confrontation between ${hero} and ${villain}, cinematic composition..."
-  ],
-  "videoPrompts": [
-    "Continuous action shot: ${hero} enters frame confidently, camera tracks movement, warm lighting, 4k cinematic...",
-    "Single scene continuous: ${villain} reacts with fear, dramatic lighting, no split screen...",
-    "Dynamic continuous shot: ${hero} defeats ${villain}, particles and energy effects, same scene throughout..."
-  ],
-  "seo": {
-    "title": "...",
-    "description": "...",
-    "tags": ["...", "...", "..."],
-    "hashtags": ["#...", "#...", "#..."]
-  }
+  "script": "short aggressive dialogue (12-16 seconds)",
+  "hook": "viral hook",
+  "imagePrompt": "cinematic food shot",
+  "videoPrompt": "cinematic video scene",
+  "title": "viral title",
+  "description": "short seo description",
+  "hashtags": ["#food", "#viral", "#shorts"]
 }
 
-Requirements:
-- Script: 12-16 seconds total, aggressive confident hero lines vs weak pathetic villain lines, extended dramatic dialogue
-- Image prompts: cinematic, warm lighting, detailed textures, professional food photography style
-- Video prompts: same scene throughout, no split screen, continuous action, dynamic camera movement
-- SEO: optimized for TikTok/YouTube Shorts/Instagram Reels`;
+IMPORTANT:
+- Return ONLY JSON
+- No extra text
+`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'mistralai/Mistral-7B-Instruct-v0.2',
       messages: [
         {
           role: 'system',
-          content: 'You are a viral content creator specializing in dramatic food battle videos. Create engaging, dramatic content with aggressive heroes and weak villains. Always respond with valid JSON.',
+          content: 'You create viral short-form content.',
         },
         {
           role: 'user',
           content: prompt,
         },
       ],
-      response_format: { type: 'json_object' },
       temperature: 0.9,
     });
 
-    const generatedContent = JSON.parse(completion.choices[0].message.content || '{}');
+    const text = completion.choices[0].message.content || "";
+
+    let parsed;
+
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      // fallback kung hindi JSON
+      parsed = {
+        script: text,
+        hook: text,
+        imagePrompt: text,
+        videoPrompt: text,
+        title: "Viral Food Battle",
+        description: text,
+        hashtags: ["#viral", "#food"],
+      };
+    }
 
     return res.status(200).json({
       success: true,
       data: {
         pair: { hero, villain },
-        ...generatedContent,
+        ...parsed,
       },
     });
+
   } catch (error) {
     console.error('Generation error:', error);
     return res.status(500).json({
