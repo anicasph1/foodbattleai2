@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 
 const openai = new OpenAI({
   apiKey: process.env.AICC_API_KEY,
-  baseURL: "https://api.aic.cc/v1",
+  baseURL: "https://api.ai.cc/v1", // ✅ FIXED
 });
 const foodPairs = [
   { hero: 'Quinoa Salad', villain: 'Fast Food Burger' },
