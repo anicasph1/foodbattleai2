@@ -108,7 +108,7 @@ IMPORTANT:
 `;
 
     const completion = await openai.chat.completions.create({
-      model: 'mistralai/Mistral-7B-Instruct-v0.2',
+      model: 'model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
