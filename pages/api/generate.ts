@@ -108,7 +108,7 @@ IMPORTANT:
 `;
 
     const completion = await openai.chat.completions.create({
-      model: 'model: 'gpt-4o-mini',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
